@@ -1,20 +1,71 @@
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import FiltroCard from '../../components/FiltroCard'
+import { RootReducer } from '../../store'
+import { alteraTermo } from '../../store/Reducers/filtro'
 import * as S from './styles'
 
-const BarraLateral = () => (
-  <S.Aside>
-    <div>
-      <S.Campo type="text" placeholder="Buscar" />
-      <S.Filtros>
-        <FiltroCard legenda="pendentes" contador={1} />
-        <FiltroCard legenda="concluídas" contador={2} />
-        <FiltroCard legenda="urgentes" contador={3} />
-        <FiltroCard legenda="importantes" contador={4} />
-        <FiltroCard legenda="normal" contador={5} />
-        <FiltroCard legenda="todas" contador={10} />
-      </S.Filtros>
-    </div>
-  </S.Aside>
-)
+import { Botao, Campo } from '../../styles'
+
+import * as enums from '../../Utils/enums/Tarefa'
+
+type Props = {
+  mostrarFiltro: boolean
+}
+
+const BarraLateral = ({ mostrarFiltro }: Props) => {
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const { termo } = useSelector((state: RootReducer) => state.filtro)
+
+  return (
+    <S.Aside>
+      <div>
+        {mostrarFiltro ? (
+          <>
+            <Campo
+              type="text"
+              placeholder="Buscar"
+              value={termo}
+              onChange={(evento) => dispatch(alteraTermo(evento.target.value))}
+            />
+            <S.Filtros>
+              <FiltroCard
+                valor={enums.Status.PENDENTE}
+                criterio="status"
+                legenda="pendentes"
+              />
+              <FiltroCard
+                criterio="status"
+                legenda="concluídas"
+                valor={enums.Status.CONCLUIDO}
+              />
+              <FiltroCard
+                criterio="prioridade"
+                legenda="urgentes"
+                valor={enums.Prioridade.URGENTE}
+              />
+              <FiltroCard
+                criterio="prioridade"
+                legenda="importantes"
+                valor={enums.Prioridade.IMPORTANTE}
+              />
+              <FiltroCard
+                criterio="prioridade"
+                legenda="normal"
+                valor={enums.Prioridade.NORMAL}
+              />
+              <FiltroCard criterio="todas" legenda="todas" />
+            </S.Filtros>
+          </>
+        ) : (
+          <Botao onClick={() => navigate('/')} type="button">
+            Voltar a lista de tarefas
+          </Botao>
+        )}
+      </div>
+    </S.Aside>
+  )
+}
 
 export default BarraLateral
